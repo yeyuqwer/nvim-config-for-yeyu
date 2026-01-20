@@ -3,10 +3,6 @@ local map = vim.api.nvim_set_keymap
 -- 复用 opt 参数
 local opt = {noremap = true, silent = true }
 
--- leader 键为空格
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
 -- * 上下快速移动，左右快速移动在 keymaps.lua 中~
 map("n", "J", "5j", opt)
 map("n", "K", "5k", opt)
