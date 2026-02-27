@@ -32,6 +32,12 @@ opt.wrap = false
 opt.whichwrap = "<,>,[,]"
 opt.hidden = true
 opt.mouse = "a"
+opt.list = true
+opt.listchars = {
+  tab = "> ",
+  trail = " ",
+  nbsp = "+",
+}
 
 opt.backup = false
 opt.writebackup = false
