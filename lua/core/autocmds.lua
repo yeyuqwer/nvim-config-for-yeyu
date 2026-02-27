@@ -1,0 +1,2 @@
+-- Place project-specific autocmds here.
+-- Keep this file loaded via `lua/config/autocmds.lua` compatibility entrypoint.
