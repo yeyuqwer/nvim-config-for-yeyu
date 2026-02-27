@@ -24,3 +24,26 @@ map("c", "<C-n>", "<Down>", { noremap = true })
 
 -- macOS: command + b toggles file explorer.
 map("n", "<D-b>", require("features.explorer").toggle, { desc = "Explorer (startup project dir)" })
+
+-- macOS: command + p triggers the same action as <leader><space> (Space Space).
+map("n", "<D-p>", "<leader><space>", { remap = true, silent = true, desc = "Find files (root dir)" })
+
+-- macOS: command + c copies to system clipboard.
+map("n", "<D-c>", '"+yy', { noremap = true, silent = true, desc = "Copy line to system clipboard" })
+map("x", "<D-c>", '"+y', { noremap = true, silent = true, desc = "Copy selection to system clipboard" })
+
+-- macOS: command + a selects the whole buffer.
+map("n", "<D-a>", "ggVG", { noremap = true, silent = true, desc = "Select all" })
+map("x", "<D-a>", "<Esc>ggVG", { noremap = true, silent = true, desc = "Select all" })
+map("i", "<D-a>", "<Esc>ggVG", { noremap = true, silent = true, desc = "Select all" })
+
+-- macOS: command + i (lowercase i) manually triggers completion menu.
+map("i", "<D-i>", function()
+  local ok, cmp = pcall(require, "blink.cmp")
+  if ok then
+    cmp.show()
+    cmp.show_signature()
+  else
+    vim.api.nvim_feedkeys(vim.keycode("<C-Space>"), "n", false)
+  end
+end, { silent = true, desc = "Trigger completion menu" })
