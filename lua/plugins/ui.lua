@@ -61,6 +61,16 @@ return {
   },
 
   {
+    "akinsho/bufferline.nvim",
+    opts = function(_, opts)
+      opts.options = opts.options or {}
+      opts.options.indicator = vim.tbl_deep_extend("force", opts.options.indicator or {}, {
+        style = "underline",
+      })
+    end,
+  },
+
+  {
     "snacks.nvim",
     opts = function(_, opts)
       opts.dashboard = opts.dashboard or {}
