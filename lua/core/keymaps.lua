@@ -3,6 +3,7 @@ local explorer = require("features.explorer")
 local navigation = require("features.navigation")
 local lsp_actions = require("features.lsp_actions")
 local completion = require("features.completion")
+local tabs = require("features.tabs")
 
 -- Fast movement.
 map({ "n", "x" }, "J", "5j", { noremap = true, silent = true })
@@ -35,6 +36,9 @@ map("c", "<C-n>", "<Down>", { noremap = true })
 map("n", "<D-b>", explorer.toggle, { desc = "Explorer (startup project dir)" })
 map({ "n", "i", "t" }, "<D-0>", navigation.focus_left_navigation, { silent = true, desc = "Focus left navigation pane" })
 map({ "n", "i", "t" }, "<D-E>", navigation.focus_left_navigation, { silent = true, desc = "Focus left navigation pane" })
+map({ "n", "i", "t" }, "<D-w>", tabs.close_tab_or_all, { silent = true, desc = "Close tab" })
+map({ "n", "i", "t" }, "<D-k>", tabs.arm_close_all_tabs, { silent = true, desc = "Arm close all tabs" })
+map({ "n", "i", "t" }, "<C-Tab>", tabs.next_tab_cycle, { silent = true, desc = "Next tab (cycle)" })
 
 -- Always search files in current startup/project root, even before opening any file.
 map("n", "<leader><space>", navigation.find_project_files, { silent = true, desc = "Find files (project dir)" })
