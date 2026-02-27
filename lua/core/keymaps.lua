@@ -1,8 +1,18 @@
 local map = vim.keymap.set
+local explorer = require("features.explorer")
+
+local function find_project_files()
+  LazyVim.pick("files", { cwd = explorer.root(), root = false })()
+end
 
 -- Fast movement.
 map({ "n", "x" }, "J", "5j", { noremap = true, silent = true })
 map({ "n", "x" }, "K", "5k", { noremap = true, silent = true })
+
+-- macOS: command + s saves current buffer.
+map("n", "<D-s>", "<cmd>w<CR>", { noremap = true, silent = true, desc = "Save file" })
+map("i", "<D-s>", "<C-o>:w<CR>", { noremap = true, silent = true, desc = "Save file" })
+map("x", "<D-s>", "<Esc><cmd>w<CR>", { noremap = true, silent = true, desc = "Save file" })
 
 -- Line start/end.
 map("n", "H", "^", { desc = "line start" })
@@ -23,10 +33,13 @@ map("c", "<C-p>", "<Up>", { noremap = true })
 map("c", "<C-n>", "<Down>", { noremap = true })
 
 -- macOS: command + b toggles file explorer.
-map("n", "<D-b>", require("features.explorer").toggle, { desc = "Explorer (startup project dir)" })
+map("n", "<D-b>", explorer.toggle, { desc = "Explorer (startup project dir)" })
 
--- macOS: command + p triggers the same action as <leader><space> (Space Space).
-map("n", "<D-p>", "<leader><space>", { remap = true, silent = true, desc = "Find files (root dir)" })
+-- Always search files in current startup/project root, even before opening any file.
+map("n", "<leader><space>", find_project_files, { silent = true, desc = "Find files (project dir)" })
+
+-- macOS: command + p searches files in current startup/project root.
+map("n", "<D-p>", find_project_files, { silent = true, desc = "Find files (project dir)" })
 
 -- macOS: command + c copies to system clipboard.
 map("n", "<D-c>", '"+yy', { noremap = true, silent = true, desc = "Copy line to system clipboard" })

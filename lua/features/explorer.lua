@@ -19,6 +19,15 @@ end
 
 M.startup_root = startup_root()
 
+if M.startup_root then
+  local cwd = vim.fs.normalize(((vim.uv or vim.loop).cwd() or ""))
+  if cwd ~= M.startup_root then
+    vim.schedule(function()
+      pcall(vim.api.nvim_set_current_dir, M.startup_root)
+    end)
+  end
+end
+
 function M.root()
   return M.startup_root or LazyVim.root({ buf = 0 })
 end

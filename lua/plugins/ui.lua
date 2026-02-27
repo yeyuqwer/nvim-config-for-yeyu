@@ -65,6 +65,11 @@ return {
     opts = function(_, opts)
       opts.dashboard = opts.dashboard or {}
       opts.dashboard.preset = opts.dashboard.preset or {}
+      opts.picker = opts.picker or {}
+      opts.picker.sources = opts.picker.sources or {}
+      opts.picker.sources.explorer = vim.tbl_deep_extend("force", opts.picker.sources.explorer or {}, {
+        hidden = true,
+      })
 
       -- * thanks https://emojicombos.com/miku
       local dot_file = vim.fn.stdpath("config") .. "/dot-art.md"
