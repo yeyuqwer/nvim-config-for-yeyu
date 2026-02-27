@@ -1,6 +1,13 @@
+-- return {
+--   {
+--     "sphamba/smear-cursor.nvim",
+--     opts = {
+--       never_draw_over_target = true,
+--     },
+--   }
+-- }
+--
+
 return {
-  "sphamba/smear-cursor.nvim",
-  opts = {
-    never_draw_over_target = true,
-  },
+  {},
 }
