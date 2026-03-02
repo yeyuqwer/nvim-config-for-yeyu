@@ -1,47 +1,17 @@
-local function scaled_index(index, src_size, dst_size)
-  if src_size <= 1 or dst_size <= 1 then
-    return 1
-  end
-  return math.floor(index * (src_size - 1) / (dst_size - 1)) + 1
-end
-
-local function build_dot_header(path, target_width, target_height, scale)
-  scale = tonumber(scale) or 1
-  target_width = math.max(1, math.floor(target_width * scale + 0.5))
-  target_height = math.max(1, math.floor(target_height * scale + 0.5))
-
+local function read_dot_header(path)
   local ok, raw_lines = pcall(vim.fn.readfile, path)
   if not ok or not raw_lines then
     return nil
   end
 
-  local lines = {}
-  local src_width = 0
+  local width = 0
   for _, line in ipairs(raw_lines) do
-    if line ~= "" then
-      lines[#lines + 1] = line
-      src_width = math.max(src_width, vim.fn.strchars(line))
-    end
+    width = math.max(width, vim.api.nvim_strwidth(line))
   end
-  if #lines == 0 or src_width == 0 then
+  if width == 0 then
     return nil
   end
-
-  local out = {}
-  local src_height = #lines
-  for row = 0, target_height - 1 do
-    local src = lines[scaled_index(row, src_height, target_height)] or ""
-    local src_line_width = vim.fn.strchars(src)
-    local cols = {}
-
-    for col = 0, target_width - 1 do
-      local src_col = scaled_index(col, src_width, target_width) - 1
-      cols[#cols + 1] = src_col < src_line_width and vim.fn.strcharpart(src, src_col, 1) or " "
-    end
-    out[#out + 1] = table.concat(cols)
-  end
-
-  return table.concat(out, "\n")
+  return table.concat(raw_lines, "\n"), width
 end
 
 return {
@@ -136,6 +106,7 @@ return {
           DiagnosticVirtualTextWarn = { bg = colors.none },
           DiagnosticVirtualTextInfo = { bg = colors.none },
           DiagnosticVirtualTextHint = { bg = colors.none },
+          SnacksDashboardHeader = { fg = "#f38ba8" },
         }
       end,
     },
@@ -169,11 +140,32 @@ return {
 
       -- * thanks https://emojicombos.com/miku
       local dot_file = vim.fn.stdpath("config") .. "/dot-art.md"
-      local dot_header = build_dot_header(dot_file, 60, 15, 0.5)
+      local dot_header, dot_width = read_dot_header(dot_file)
       if dot_header then
-        opts.dashboard.width = 52
+        opts.dashboard.width = math.max(opts.dashboard.width or 60, dot_width)
         opts.dashboard.preset.header = dot_header
       end
+      opts.dashboard.preset.keys = vim.tbl_filter(function(item)
+        local key = tostring(item.key or "")
+        local desc = tostring(item.desc or "")
+        local action = tostring(item.action or "")
+        if key == "q" or key == "l" or key == "L" then
+          return false
+        end
+        if desc == "Quit" or desc == "Lazy" then
+          return false
+        end
+        if action == ":qa" or action == ":Lazy" then
+          return false
+        end
+        return true
+      end, opts.dashboard.preset.keys or {})
+
+      opts.dashboard.sections = {
+        { header = opts.dashboard.preset.header, padding = 0 },
+        { section = "keys",                      gap = 1,    padding = 1 },
+        { section = "startup" },
+      }
     end,
   },
 }
