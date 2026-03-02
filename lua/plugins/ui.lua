@@ -57,6 +57,81 @@ return {
     name = "catppuccin",
     opts = {
       flavour = "mocha",
+      float = {
+        solid = true,
+      },
+      term_colors = true,
+      dim_inactive = {
+        enabled = true,
+      },
+      styles = {
+        loops = { "italic" },
+        keywords = { "italic" },
+        types = { "bold" },
+        properties = { "italic" },
+      },
+      integrations = {
+        indent_blankline = {
+          scope_color = "lavender",
+        },
+        lualine = {
+          all = function(colors)
+            return {
+              normal = {
+                a = { bg = "#f38ba8", fg = colors.base, gui = "bold" },
+                b = { bg = colors.surface0, fg = "#f38ba8" },
+              },
+              insert = {
+                a = { bg = colors.peach, fg = colors.base, gui = "bold" },
+                b = { bg = colors.surface0, fg = colors.peach },
+              },
+              terminal = {
+                a = { bg = colors.peach, fg = colors.base, gui = "bold" },
+                b = { bg = colors.surface0, fg = colors.peach },
+              },
+              command = {
+                a = { bg = colors.peach, fg = colors.base, gui = "bold" },
+                b = { bg = colors.surface0, fg = colors.peach },
+              },
+              visual = {
+                a = { bg = "#f38ba8", fg = colors.base, gui = "bold" },
+                b = { bg = colors.surface0, fg = "#f38ba8" },
+              },
+              replace = {
+                a = { bg = colors.maroon, fg = colors.base, gui = "bold" },
+                b = { bg = colors.surface0, fg = colors.maroon },
+              },
+              inactive = {
+                a = { fg = "#f38ba8" },
+                b = { fg = colors.surface1, gui = "bold" },
+                c = { fg = colors.overlay0 },
+              },
+            }
+          end,
+        },
+        mini = { indentscope_color = "lavender" },
+        snacks = { enabled = true, indent_scope_color = "lavender" },
+      },
+      custom_highlights = function(colors)
+        return {
+          CursorLineNr = { fg = colors.lavender, style = { "bold" } },
+          LineNr = { fg = colors.surface2 },
+          FloatBorder = { fg = colors.surface2, bg = colors.mantle },
+          FloatTitle = { fg = colors.blue, style = { "bold" } },
+          NormalFloat = { bg = colors.mantle },
+          Pmenu = { bg = colors.mantle },
+          PmenuSel = { bg = colors.surface0, style = { "bold" } },
+          Search = { bg = colors.yellow, fg = colors.base },
+          CurSearch = { bg = colors.peach, fg = colors.base },
+          IncSearch = { bg = colors.peach, fg = colors.base },
+          Visual = { bg = colors.surface1 },
+          WinSeparator = { fg = colors.surface1 },
+          DiagnosticVirtualTextError = { bg = colors.none },
+          DiagnosticVirtualTextWarn = { bg = colors.none },
+          DiagnosticVirtualTextInfo = { bg = colors.none },
+          DiagnosticVirtualTextHint = { bg = colors.none },
+        }
+      end,
     },
   },
 
@@ -67,6 +142,11 @@ return {
       opts.options.indicator = vim.tbl_deep_extend("force", opts.options.indicator or {}, {
         style = "underline",
       })
+      if (vim.g.colors_name or ""):find("catppuccin") then
+        opts.highlights = require("catppuccin.special.bufferline").get_theme({
+          styles = { "bold" },
+        })
+      end
     end,
   },
 
