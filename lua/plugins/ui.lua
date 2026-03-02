@@ -57,8 +57,10 @@ return {
     name = "catppuccin",
     opts = {
       flavour = "mocha",
+      transparent_background = true,
       float = {
-        solid = true,
+        transparent = true,
+        solid = false,
       },
       term_colors = true,
       dim_inactive = {
@@ -114,12 +116,16 @@ return {
       },
       custom_highlights = function(colors)
         return {
+          Normal = { bg = colors.none },
+          NormalNC = { bg = colors.none },
+          SignColumn = { bg = colors.none },
+          EndOfBuffer = { bg = colors.none },
           CursorLineNr = { fg = colors.lavender, style = { "bold" } },
           LineNr = { fg = colors.surface2 },
-          FloatBorder = { fg = colors.surface2, bg = colors.mantle },
+          FloatBorder = { fg = colors.surface2, bg = colors.none },
           FloatTitle = { fg = colors.blue, style = { "bold" } },
-          NormalFloat = { bg = colors.mantle },
-          Pmenu = { bg = colors.mantle },
+          NormalFloat = { bg = colors.none },
+          Pmenu = { bg = colors.none },
           PmenuSel = { bg = colors.surface0, style = { "bold" } },
           Search = { bg = colors.yellow, fg = colors.base },
           CurSearch = { bg = colors.peach, fg = colors.base },
