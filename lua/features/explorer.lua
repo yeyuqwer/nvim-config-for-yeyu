@@ -36,7 +36,7 @@ function M.root()
   return M.startup_root or LazyVim.root({ buf = 0 })
 end
 
-local function focused_explorer_dir()
+local function focused_explorer_picker()
   local ok, snacks = pcall(require, "snacks")
   if not ok then
     return nil
@@ -48,6 +48,15 @@ local function focused_explorer_dir()
   end
   local win_name = picker:current_win()
   if win_name ~= "list" then
+    return nil
+  end
+
+  return picker
+end
+
+local function focused_explorer_dir()
+  local picker = focused_explorer_picker()
+  if not picker then
     return nil
   end
 
@@ -63,6 +72,19 @@ end
 
 local function default_create_dir()
   return focused_explorer_dir() or vim.fs.normalize(M.root() or vim.fn.getcwd())
+end
+
+local function delete_path(path)
+  local ok_actions, actions = pcall(require, "snacks.explorer.actions")
+  if ok_actions and actions.trash then
+    return actions.trash(path)
+  end
+
+  local ok, ret = pcall(vim.fn.delete, path, "rf")
+  if ok and ret == 0 then
+    return true
+  end
+  return false, type(ret) == "string" and ret or "Unknown error"
 end
 
 local function resolve_target(input, base_dir)
@@ -150,6 +172,69 @@ function M.create_folder()
 
     notify("Created folder: " .. path)
   end)
+end
+
+function M.delete_current()
+  local picker = focused_explorer_picker()
+  if picker then
+    local item = picker:current()
+    local path = item and item.file or nil
+    if not path or path == "" then
+      notify("No file/folder under explorer cursor", vim.log.levels.WARN)
+      return
+    end
+    path = vim.fs.normalize(path)
+
+    local ok, err = delete_path(path)
+    if not ok then
+      notify("Failed to delete `" .. path .. "`:\n" .. tostring(err), vim.log.levels.ERROR)
+      return
+    end
+
+    local ok_snacks, snacks = pcall(require, "snacks")
+    if ok_snacks and snacks.bufdelete then
+      snacks.bufdelete({ file = path, force = true })
+    end
+
+    local ok_tree, tree = pcall(require, "snacks.explorer.tree")
+    if ok_tree then
+      tree:refresh(vim.fs.dirname(path))
+    end
+
+    local ok_actions, actions = pcall(require, "snacks.explorer.actions")
+    if ok_actions and actions.update then
+      actions.update(picker, { refresh = true })
+    end
+
+    notify("Deleted: " .. path)
+    return
+  end
+
+  local path = vim.api.nvim_buf_get_name(0)
+  if path == "" then
+    notify("No file under cursor to delete", vim.log.levels.WARN)
+    return
+  end
+  path = vim.fs.normalize(path)
+
+  if vim.fn.filereadable(path) == 0 and vim.fn.isdirectory(path) == 0 then
+    notify("Path does not exist: " .. path, vim.log.levels.WARN)
+    return
+  end
+
+  local ok, err = delete_path(path)
+  if not ok then
+    notify("Failed to delete `" .. path .. "`:\n" .. tostring(err), vim.log.levels.ERROR)
+    return
+  end
+
+  local ok_snacks, snacks = pcall(require, "snacks")
+  if ok_snacks and snacks.bufdelete then
+    snacks.bufdelete({ file = path, force = true })
+  else
+    pcall(vim.cmd, "bdelete!")
+  end
+  notify("Deleted: " .. path)
 end
 
 return M
