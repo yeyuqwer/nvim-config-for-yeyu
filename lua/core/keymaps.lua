@@ -35,6 +35,8 @@ map("c", "<C-n>", "<Down>", { noremap = true })
 
 -- macOS: command + b toggles file explorer.
 map("n", "<D-b>", explorer.toggle, { desc = "Explorer (startup project dir)" })
+map({ "n", "i", "t" }, "<D-n>", explorer.create_file, { silent = true, desc = "Create file" })
+map({ "n", "i", "t" }, "<D-C-n>", explorer.create_folder, { silent = true, desc = "Create folder" })
 map({ "n", "i", "t" }, "<D-0>", navigation.focus_left_navigation, { silent = true, desc = "Focus left navigation pane" })
 map({ "n", "i", "t" }, "<D-E>", navigation.focus_left_navigation, { silent = true, desc = "Focus left navigation pane" })
 map({ "n", "i", "t" }, "<D-w>", tabs.close_tab_or_all, { silent = true, desc = "Close tab" })

@@ -19,6 +19,10 @@ end
 
 M.startup_root = startup_root()
 
+local function notify(message, level)
+  vim.notify(message, level or vim.log.levels.INFO, { title = "Explorer" })
+end
+
 if M.startup_root then
   local cwd = vim.fs.normalize(((vim.uv or vim.loop).cwd() or ""))
   if cwd ~= M.startup_root then
@@ -30,6 +34,51 @@ end
 
 function M.root()
   return M.startup_root or LazyVim.root({ buf = 0 })
+end
+
+local function focused_explorer_dir()
+  local ok, snacks = pcall(require, "snacks")
+  if not ok then
+    return nil
+  end
+
+  local picker = snacks.picker.get({ source = "explorer" })[1]
+  if not picker or picker.closed or not picker:is_focused() then
+    return nil
+  end
+  local win_name = picker:current_win()
+  if win_name ~= "list" then
+    return nil
+  end
+
+  local ok_dir, dir = pcall(function()
+    return picker:dir()
+  end)
+  if not ok_dir or not dir or dir == "" then
+    return nil
+  end
+
+  return vim.fs.normalize(dir)
+end
+
+local function default_create_dir()
+  return focused_explorer_dir() or vim.fs.normalize(M.root() or vim.fn.getcwd())
+end
+
+local function resolve_target(input, base_dir)
+  local text = vim.trim(input or "")
+  if text == "" then
+    return nil
+  end
+
+  if text:sub(1, 1) == "/" then
+    return vim.fs.normalize(text)
+  end
+  if text:sub(1, 1) == "~" then
+    return vim.fs.normalize(vim.fn.expand(text))
+  end
+
+  return vim.fs.normalize(vim.fs.joinpath(base_dir, text))
 end
 
 function M.toggle()
@@ -45,6 +94,62 @@ function M.toggle()
   end
 
   snacks.explorer({ cwd = M.root() })
+end
+
+function M.create_file()
+  local base_dir = default_create_dir()
+  vim.ui.input({ prompt = "New file (" .. base_dir .. "): " }, function(input)
+    local path = resolve_target(input, base_dir)
+    if not path then
+      return
+    end
+
+    if vim.fn.isdirectory(path) == 1 then
+      notify("Cannot create file, path is a directory: " .. path, vim.log.levels.ERROR)
+      return
+    end
+
+    local parent = vim.fs.dirname(path)
+    if vim.fn.isdirectory(parent) == 0 then
+      local ok, err = pcall(vim.fn.mkdir, parent, "p")
+      if not ok then
+        notify("Failed to create parent directory: " .. tostring(err), vim.log.levels.ERROR)
+        return
+      end
+    end
+
+    local file, err = io.open(path, "a")
+    if not file then
+      notify("Failed to create file: " .. tostring(err), vim.log.levels.ERROR)
+      return
+    end
+    file:close()
+
+    vim.cmd.edit(vim.fn.fnameescape(path))
+  end)
+end
+
+function M.create_folder()
+  local base_dir = default_create_dir()
+  vim.ui.input({ prompt = "New folder (" .. base_dir .. "): " }, function(input)
+    local path = resolve_target(input, base_dir)
+    if not path then
+      return
+    end
+
+    if vim.fn.filereadable(path) == 1 then
+      notify("Cannot create folder, path is a file: " .. path, vim.log.levels.ERROR)
+      return
+    end
+
+    local ok, result = pcall(vim.fn.mkdir, path, "p")
+    if not ok or result == 0 then
+      notify("Failed to create folder: " .. path, vim.log.levels.ERROR)
+      return
+    end
+
+    notify("Created folder: " .. path)
+  end)
 end
 
 return M
