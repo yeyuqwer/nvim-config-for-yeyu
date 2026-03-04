@@ -3,6 +3,18 @@ local M = {}
 local close_all_armed = false
 local arm_token = 0
 
+local function is_opencode_buffer(buf)
+  local name = (vim.api.nvim_buf_get_name(buf) or ""):lower()
+  local ft = (vim.bo[buf].filetype or ""):lower()
+  local term_title = ""
+  pcall(function()
+    term_title = tostring(vim.b[buf].term_title or ""):lower()
+  end)
+  return name:find("opencode", 1, true) ~= nil
+    or ft:find("opencode", 1, true) ~= nil
+    or term_title:find("opencode", 1, true) ~= nil
+end
+
 local function leave_insert_or_terminal_mode()
   local mode = vim.api.nvim_get_mode().mode:sub(1, 1)
   if mode == "i" then
@@ -27,6 +39,27 @@ end
 
 function M.close_tab_or_all()
   leave_insert_or_terminal_mode()
+
+  local current_buf = vim.api.nvim_get_current_buf()
+  if is_opencode_buffer(current_buf) then
+    vim.schedule(function()
+      local stopped = pcall(function()
+        require("opencode").stop()
+      end)
+      if stopped then
+        return
+      end
+
+      local current_win = vim.api.nvim_get_current_win()
+      if vim.api.nvim_win_is_valid(current_win) and #vim.api.nvim_tabpage_list_wins(0) > 1 then
+        pcall(vim.api.nvim_win_close, current_win, true)
+      end
+      if vim.api.nvim_buf_is_valid(current_buf) then
+        pcall(vim.api.nvim_buf_delete, current_buf, { force = true })
+      end
+    end)
+    return
+  end
 
   local ok, snacks = pcall(require, "snacks")
 
