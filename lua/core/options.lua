@@ -50,7 +50,6 @@ opt.splitbelow = true
 opt.splitright = true
 
 opt.completeopt = { "menu", "menuone", "noselect", "noinsert" }
-opt.background = "dark"
 opt.termguicolors = true
 opt.wildmenu = true
 opt.shortmess:append("c")

@@ -17,20 +17,28 @@ end
 return {
   {
     "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "catppuccin-mocha",
-    },
+    config = function(_, opts)
+      opts = opts or {}
+      -- Let Nvim detect the terminal/UI background, then load the matching
+      -- Catppuccin flavour: `mocha` for dark and `latte` for light.
+      opts.colorscheme = "catppuccin"
+      require("lazyvim").setup(opts)
+    end,
   },
 
   {
     "catppuccin/nvim",
     name = "catppuccin",
     opts = {
-      flavour = "mocha",
-      transparent_background = false,
+      flavour = "auto",
+      transparent_background = true,
+      float = {
+        transparent = true,
+        solid = false,
+      },
       term_colors = true,
       dim_inactive = {
-        enabled = true,
+        enabled = false,
       },
       styles = {
         loops = { "italic" },
@@ -44,35 +52,42 @@ return {
         },
         lualine = {
           all = function(colors)
+            local transparent = "NONE"
             return {
               normal = {
-                a = { bg = "#f38ba8", fg = colors.base, gui = "bold" },
-                b = { bg = colors.surface0, fg = "#f38ba8" },
+                a = { bg = colors.pink, fg = colors.base, gui = "bold" },
+                b = { bg = transparent, fg = colors.pink },
+                c = { bg = transparent, fg = colors.text },
               },
               insert = {
                 a = { bg = colors.peach, fg = colors.base, gui = "bold" },
-                b = { bg = colors.surface0, fg = colors.peach },
+                b = { bg = transparent, fg = colors.peach },
+                c = { bg = transparent, fg = colors.text },
               },
               terminal = {
                 a = { bg = colors.peach, fg = colors.base, gui = "bold" },
-                b = { bg = colors.surface0, fg = colors.peach },
+                b = { bg = transparent, fg = colors.peach },
+                c = { bg = transparent, fg = colors.text },
               },
               command = {
                 a = { bg = colors.peach, fg = colors.base, gui = "bold" },
-                b = { bg = colors.surface0, fg = colors.peach },
+                b = { bg = transparent, fg = colors.peach },
+                c = { bg = transparent, fg = colors.text },
               },
               visual = {
-                a = { bg = "#f38ba8", fg = colors.base, gui = "bold" },
-                b = { bg = colors.surface0, fg = "#f38ba8" },
+                a = { bg = colors.pink, fg = colors.base, gui = "bold" },
+                b = { bg = transparent, fg = colors.pink },
+                c = { bg = transparent, fg = colors.text },
               },
               replace = {
                 a = { bg = colors.maroon, fg = colors.base, gui = "bold" },
-                b = { bg = colors.surface0, fg = colors.maroon },
+                b = { bg = transparent, fg = colors.maroon },
+                c = { bg = transparent, fg = colors.text },
               },
               inactive = {
-                a = { fg = "#f38ba8" },
-                b = { fg = colors.surface1, gui = "bold" },
-                c = { fg = colors.overlay0 },
+                a = { bg = transparent, fg = colors.pink },
+                b = { bg = transparent, fg = colors.surface1, gui = "bold" },
+                c = { bg = transparent, fg = colors.overlay0 },
               },
             }
           end,
@@ -81,18 +96,32 @@ return {
         snacks = { enabled = true, indent_scope_color = "lavender" },
       },
       custom_highlights = function(colors)
+        local transparent = "NONE"
         return {
+          Normal = { bg = transparent },
+          NormalNC = { bg = transparent },
+          NormalFloat = { bg = transparent },
+          FloatBorder = { fg = colors.surface2, bg = transparent },
+          FloatTitle = { fg = colors.blue, bg = transparent, style = { "bold" } },
+          SignColumn = { bg = transparent },
+          FoldColumn = { bg = transparent },
+          EndOfBuffer = { bg = transparent },
+          StatusLine = { bg = transparent },
+          StatusLineNC = { bg = transparent },
+          TabLineFill = { bg = transparent },
+          WinBar = { bg = transparent },
+          WinBarNC = { bg = transparent },
+          Pmenu = { bg = transparent },
+          PmenuSbar = { bg = transparent },
           CursorLineNr = { fg = colors.lavender, style = { "bold" } },
           LineNr = { fg = colors.surface2 },
-          FloatBorder = { fg = colors.surface2 },
-          FloatTitle = { fg = colors.blue, style = { "bold" } },
           PmenuSel = { bg = colors.surface0, style = { "bold" } },
           Search = { bg = colors.yellow, fg = colors.base },
           CurSearch = { bg = colors.peach, fg = colors.base },
           IncSearch = { bg = colors.peach, fg = colors.base },
           Visual = { bg = colors.surface1 },
           WinSeparator = { fg = colors.surface1 },
-          SnacksDashboardHeader = { fg = "#f38ba8" },
+          SnacksDashboardHeader = { fg = colors.pink },
         }
       end,
     },
