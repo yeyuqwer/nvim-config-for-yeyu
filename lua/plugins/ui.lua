@@ -27,11 +27,7 @@ return {
     name = "catppuccin",
     opts = {
       flavour = "mocha",
-      transparent_background = true,
-      float = {
-        transparent = true,
-        solid = false,
-      },
+      transparent_background = false,
       term_colors = true,
       dim_inactive = {
         enabled = true,
@@ -86,26 +82,16 @@ return {
       },
       custom_highlights = function(colors)
         return {
-          Normal = { bg = colors.none },
-          NormalNC = { bg = colors.none },
-          SignColumn = { bg = colors.none },
-          EndOfBuffer = { bg = colors.none },
           CursorLineNr = { fg = colors.lavender, style = { "bold" } },
           LineNr = { fg = colors.surface2 },
-          FloatBorder = { fg = colors.surface2, bg = colors.none },
+          FloatBorder = { fg = colors.surface2 },
           FloatTitle = { fg = colors.blue, style = { "bold" } },
-          NormalFloat = { bg = colors.none },
-          Pmenu = { bg = colors.none },
           PmenuSel = { bg = colors.surface0, style = { "bold" } },
           Search = { bg = colors.yellow, fg = colors.base },
           CurSearch = { bg = colors.peach, fg = colors.base },
           IncSearch = { bg = colors.peach, fg = colors.base },
           Visual = { bg = colors.surface1 },
           WinSeparator = { fg = colors.surface1 },
-          DiagnosticVirtualTextError = { bg = colors.none },
-          DiagnosticVirtualTextWarn = { bg = colors.none },
-          DiagnosticVirtualTextInfo = { bg = colors.none },
-          DiagnosticVirtualTextHint = { bg = colors.none },
           SnacksDashboardHeader = { fg = "#f38ba8" },
         }
       end,
@@ -136,6 +122,13 @@ return {
       opts.picker.sources = opts.picker.sources or {}
       opts.picker.sources.explorer = vim.tbl_deep_extend("force", opts.picker.sources.explorer or {}, {
         hidden = true,
+        win = {
+          list = {
+            keys = {
+              ["<CR>"] = "explorer_rename",
+            },
+          },
+        },
       })
 
       -- * thanks https://emojicombos.com/miku
