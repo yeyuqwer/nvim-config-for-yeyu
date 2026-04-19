@@ -42,6 +42,7 @@ opt.listchars = {
 opt.backup = false
 opt.writebackup = false
 opt.swapfile = false
+opt.autowriteall = true
 
 opt.updatetime = 300
 opt.timeoutlen = 500

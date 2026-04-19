@@ -1,5 +1,39 @@
 local group = vim.api.nvim_create_augroup("lawliet_core_autocmds", { clear = true })
 
+local function canAutoSave(buf)
+  if not vim.api.nvim_buf_is_valid(buf) then
+    return false
+  end
+
+  if not vim.bo[buf].modified or not vim.bo[buf].modifiable or vim.bo[buf].readonly then
+    return false
+  end
+
+  if vim.bo[buf].buftype ~= "" then
+    return false
+  end
+
+  return vim.api.nvim_buf_get_name(buf) ~= ""
+end
+
+local function autoSaveBuffer(buf)
+  if not canAutoSave(buf) then
+    return
+  end
+
+  vim.api.nvim_buf_call(buf, function()
+    -- Persist file contents without piggybacking on save-time automations.
+    local ok, err = pcall(vim.cmd, "silent noautocmd update")
+    if ok then
+      return
+    end
+
+    vim.schedule(function()
+      vim.notify(("Auto save failed: %s"):format(err), vim.log.levels.WARN)
+    end)
+  end)
+end
+
 -- When opening `nvim <directory>`, snacks explorer focuses a picker buffer.
 -- Built-in `:terminal` cannot start from that buffer, so return focus to a
 -- normal editing window after startup.
@@ -30,5 +64,16 @@ vim.api.nvim_create_autocmd("VimEnter", {
         end
       end
     end)
+  end,
+})
+
+vim.api.nvim_create_autocmd({ "InsertLeave", "BufLeave", "FocusLost", "CursorHold", "CursorHoldI" }, {
+  group = group,
+  callback = function(args)
+    if vim.fn.pumvisible() == 1 then
+      return
+    end
+
+    autoSaveBuffer(args.buf)
   end,
 })
