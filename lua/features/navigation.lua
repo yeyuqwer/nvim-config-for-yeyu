@@ -1,15 +1,24 @@
 local M = {}
 local explorer = require("features.explorer")
 
+local function leave_insert_or_terminal_mode()
+  local mode = vim.api.nvim_get_mode().mode:sub(1, 1)
+  if mode == "i" then
+    vim.cmd("stopinsert")
+    return
+  end
+
+  if mode == "t" then
+    vim.api.nvim_feedkeys(vim.keycode("<C-\\><C-n>"), "n", false)
+  end
+end
+
 function M.find_project_files()
   LazyVim.pick("files", { cwd = explorer.root(), root = false })()
 end
 
 function M.focus_left_navigation()
-  local mode = vim.api.nvim_get_mode().mode
-  if mode:sub(1, 1) == "i" or mode:sub(1, 1) == "t" then
-    vim.cmd("stopinsert")
-  end
+  leave_insert_or_terminal_mode()
 
   local ok, snacks = pcall(require, "snacks")
   if ok and snacks.picker then
@@ -24,6 +33,20 @@ function M.focus_left_navigation()
   end
 
   vim.cmd("wincmd h")
+end
+
+function M.focus_window(direction)
+  if direction == "h" then
+    M.focus_left_navigation()
+    return
+  end
+
+  if direction ~= "j" and direction ~= "k" and direction ~= "l" then
+    return
+  end
+
+  leave_insert_or_terminal_mode()
+  vim.cmd("wincmd " .. direction)
 end
 
 return M

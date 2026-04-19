@@ -6,6 +6,17 @@ local completion = require("features.completion")
 local tabs = require("features.tabs")
 local terminal = require("features.terminal")
 
+for key, label in pairs({
+  h = "left",
+  j = "down",
+  k = "up",
+  l = "right",
+}) do
+  map({ "n", "i", "t" }, "<C-" .. key .. ">", function()
+    navigation.focus_window(key)
+  end, { silent = true, desc = "Focus " .. label .. " window" })
+end
+
 -- Fast movement.
 map({ "n", "x" }, "J", "5j", { noremap = true, silent = true })
 map({ "n", "x" }, "K", "5k", { noremap = true, silent = true })

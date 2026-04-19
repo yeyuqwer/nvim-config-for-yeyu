@@ -28,6 +28,7 @@ return {
   config = function()
     ---@type opencode.Opts
     vim.g.opencode_opts = {}
+    local navigation = require("features.navigation")
 
     vim.o.autoread = true
 
@@ -41,20 +42,6 @@ return {
       return name:find("opencode", 1, true) ~= nil
         or ft:find("opencode", 1, true) ~= nil
         or term_title:find("opencode", 1, true) ~= nil
-    end
-
-    local function focus_left_if_opencode(mode)
-      local buf = vim.api.nvim_get_current_buf()
-      if not is_opencode_buffer(buf) then
-        return "<C-h>"
-      end
-      if mode == "t" then
-        return "<C-\\><C-n><C-w>h"
-      end
-      if mode == "i" then
-        return "<Esc><C-w>h"
-      end
-      return "<C-w>h"
     end
 
     local function leave_insert_or_terminal_mode()
@@ -121,16 +108,10 @@ return {
       require("opencode").command("session.half.page.down")
     end, { desc = "Scroll opencode down" })
 
-    -- In opencode UI, use Ctrl+h to jump to the left window.
-    vim.keymap.set("n", "<C-h>", function()
-      return focus_left_if_opencode("n")
-    end, { expr = true, desc = "Opencode: focus left window" })
-    vim.keymap.set("i", "<C-h>", function()
-      return focus_left_if_opencode("i")
-    end, { expr = true, desc = "Opencode: focus left window" })
-    vim.keymap.set("t", "<C-h>", function()
-      return focus_left_if_opencode("t")
-    end, { expr = true, desc = "Opencode: focus left window" })
+    -- Keep Ctrl+h aligned with the shared window navigation behavior.
+    vim.keymap.set({ "n", "i", "t" }, "<C-h>", function()
+      navigation.focus_window("h")
+    end, { silent = true, desc = "Focus left window" })
     vim.keymap.set({ "n", "i", "t" }, "<D-w>", close_opencode_or_tab, {
       silent = true,
       desc = "Close opencode or tab",
