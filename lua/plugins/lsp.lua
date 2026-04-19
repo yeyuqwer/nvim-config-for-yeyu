@@ -68,6 +68,7 @@ return {
     opts = {
       ensure_installed = {
         "lua-language-server",
+        "rust-analyzer",
         "typescript-language-server",
       },
     },
@@ -81,6 +82,7 @@ return {
 
       opts.servers = opts.servers or {}
       opts.servers.lua_ls = opts.servers.lua_ls or {}
+      opts.servers.rust_analyzer = opts.servers.rust_analyzer or {}
       opts.servers.ts_ls = opts.servers.ts_ls or {}
       opts.diagnostics = vim.tbl_deep_extend("force", opts.diagnostics or {}, {
         virtual_text = {

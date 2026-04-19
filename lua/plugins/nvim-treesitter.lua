@@ -16,6 +16,7 @@ return {
         "markdown",
         "markdown_inline",
         "regex",
+        "rust",
         "toml",
         "tsx",
         "typescript",
