@@ -38,7 +38,37 @@ return {
       },
 
       -- (Default) Only show the documentation popup when manually triggered
-      completion = { documentation = { auto_show = false } },
+      completion = {
+        menu = {
+          border = 'rounded',
+          winblend = 0,
+          winhighlight = 'Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None',
+          draw = {
+            padding = { 1, 1 },
+          },
+        },
+        documentation = {
+          auto_show = false,
+          window = {
+            border = 'rounded',
+            winblend = 0,
+            max_width = 88,
+            max_height = 18,
+            winhighlight = 'Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,EndOfBuffer:BlinkCmpDoc',
+          },
+        },
+      },
+
+      signature = {
+        window = {
+          border = 'rounded',
+          winblend = 0,
+          max_width = 88,
+          max_height = 8,
+          direction_priority = { 's', 'n' },
+          winhighlight = 'Normal:BlinkCmpSignatureHelp,FloatBorder:BlinkCmpSignatureHelpBorder',
+        },
+      },
 
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`

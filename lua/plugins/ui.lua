@@ -103,6 +103,17 @@ return {
           NormalFloat = { bg = transparent },
           FloatBorder = { fg = colors.surface2, bg = transparent },
           FloatTitle = { fg = colors.blue, bg = transparent, style = { "bold" } },
+          NoiceLspDoc = { fg = colors.text, bg = transparent },
+          NoiceLspDocBorder = { fg = colors.blue, bg = transparent },
+          BlinkCmpDoc = { fg = colors.text, bg = transparent },
+          BlinkCmpDocBorder = { fg = colors.blue, bg = transparent },
+          BlinkCmpDocSeparator = { fg = colors.surface1, bg = transparent },
+          BlinkCmpMenu = { fg = colors.text, bg = transparent },
+          BlinkCmpMenuBorder = { fg = colors.surface2, bg = transparent },
+          BlinkCmpMenuSelection = { fg = colors.text, bg = colors.surface0, style = { "bold" } },
+          BlinkCmpSignatureHelp = { fg = colors.text, bg = transparent },
+          BlinkCmpSignatureHelpBorder = { fg = colors.blue, bg = transparent },
+          BlinkCmpSignatureHelpActiveParameter = { fg = colors.blue, bg = transparent, style = { "bold" } },
           SignColumn = { bg = transparent },
           FoldColumn = { bg = transparent },
           EndOfBuffer = { bg = transparent },
@@ -125,6 +136,66 @@ return {
         }
       end,
     },
+  },
+
+  {
+    "folke/noice.nvim",
+    opts = function(_, opts)
+      opts.views = opts.views or {}
+      opts.views.hover = vim.tbl_deep_extend("force", opts.views.hover or {}, {
+        anchor = "NW",
+        border = {
+          style = "rounded",
+          padding = { 0, 1 },
+        },
+        position = { row = 2, col = 0 },
+        size = {
+          width = "auto",
+          height = "auto",
+          max_width = 96,
+          max_height = 12,
+        },
+        win_options = {
+          winblend = 0,
+          winhighlight = {
+            Normal = "NoiceLspDoc",
+            FloatBorder = "NoiceLspDocBorder",
+            EndOfBuffer = "NoiceLspDoc",
+          },
+          wrap = true,
+          linebreak = true,
+        },
+      })
+
+      opts.lsp = opts.lsp or {}
+      opts.lsp.documentation = opts.lsp.documentation or {}
+      opts.lsp.documentation.opts = vim.tbl_deep_extend("force", opts.lsp.documentation.opts or {}, {
+        win_options = {
+          winblend = 0,
+          winhighlight = {
+            Normal = "NoiceLspDoc",
+            FloatBorder = "NoiceLspDocBorder",
+            EndOfBuffer = "NoiceLspDoc",
+          },
+        },
+      })
+      opts.lsp.hover = opts.lsp.hover or {}
+      opts.lsp.hover.opts = vim.tbl_deep_extend("force", opts.lsp.hover.opts or {}, {
+        anchor = "NW",
+        position = { row = 2, col = 0 },
+      })
+      opts.lsp.signature = opts.lsp.signature or {}
+      opts.lsp.signature.opts = vim.tbl_deep_extend("force", opts.lsp.signature.opts or {}, {
+        anchor = "NW",
+        position = { row = 2, col = 0 },
+        size = {
+          width = "auto",
+          height = "auto",
+          max_width = 96,
+          max_height = 8,
+        },
+      })
+    end,
   },
 
   {

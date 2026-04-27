@@ -95,6 +95,7 @@ return {
       opts.servers["*"] = opts.servers["*"] or {}
       opts.servers["*"].keys = opts.servers["*"].keys or {}
       table.insert(opts.servers["*"].keys, { "K", false })
+      table.insert(opts.servers["*"].keys, { "<leader>k", function() return vim.lsp.buf.hover() end, desc = "Hover" })
       table.insert(opts.servers["*"].keys, { "<leader>ch", function() return vim.lsp.buf.hover() end, desc = "Hover" })
     end,
   },
