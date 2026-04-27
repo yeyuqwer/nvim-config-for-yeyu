@@ -22,6 +22,11 @@ function M.find_project_text()
   LazyVim.pick("live_grep", { cwd = explorer.root(), root = false })()
 end
 
+function M.open_command_palette()
+  leave_insert_or_terminal_mode()
+  LazyVim.pick("commands")()
+end
+
 function M.focus_left_navigation()
   leave_insert_or_terminal_mode()
 

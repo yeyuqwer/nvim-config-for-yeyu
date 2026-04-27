@@ -62,6 +62,9 @@ map("n", "<leader><space>", navigation.find_project_files, { silent = true, desc
 -- macOS: command + p searches files in current startup/project root.
 map("n", "<D-p>", navigation.find_project_files, { silent = true, desc = "Find files (project dir)" })
 
+-- macOS: command + shift + p opens the command palette.
+map({ "n", "i", "x", "t" }, "<D-P>", navigation.open_command_palette, { silent = true, desc = "Command palette" })
+
 -- macOS: command + f searches text in current startup/project root.
 map({ "n", "i", "x", "t" }, "<D-f>", navigation.find_project_text, { silent = true, desc = "Search text (project dir)" })
 
