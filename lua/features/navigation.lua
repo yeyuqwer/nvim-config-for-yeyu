@@ -17,6 +17,11 @@ function M.find_project_files()
   LazyVim.pick("files", { cwd = explorer.root(), root = false })()
 end
 
+function M.find_project_text()
+  leave_insert_or_terminal_mode()
+  LazyVim.pick("live_grep", { cwd = explorer.root(), root = false })()
+end
+
 function M.focus_left_navigation()
   leave_insert_or_terminal_mode()
 

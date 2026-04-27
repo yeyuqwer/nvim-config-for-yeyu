@@ -62,6 +62,9 @@ map("n", "<leader><space>", navigation.find_project_files, { silent = true, desc
 -- macOS: command + p searches files in current startup/project root.
 map("n", "<D-p>", navigation.find_project_files, { silent = true, desc = "Find files (project dir)" })
 
+-- macOS: command + f searches text in current startup/project root.
+map({ "n", "i", "x", "t" }, "<D-f>", navigation.find_project_text, { silent = true, desc = "Search text (project dir)" })
+
 -- macOS: command + c copies to system clipboard.
 map("n", "<D-c>", '"+yy', { noremap = true, silent = true, desc = "Copy line to system clipboard" })
 map("x", "<D-c>", '"+y', { noremap = true, silent = true, desc = "Copy selection to system clipboard" })
