@@ -69,8 +69,13 @@ vim.api.nvim_create_autocmd("VimEnter", {
 
 vim.api.nvim_create_autocmd("FileType", {
   group = group,
-  callback = function()
+  callback = function(args)
     vim.opt_local.formatoptions:remove({ "c", "r", "o" })
+
+    if vim.bo[args.buf].filetype == "markdown" or vim.bo[args.buf].filetype == "markdown.mdx" then
+      vim.opt_local.spell = false
+      vim.diagnostic.enable(false, { bufnr = args.buf })
+    end
   end,
 })
 
