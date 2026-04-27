@@ -215,9 +215,28 @@ return {
 
   {
     "snacks.nvim",
+    keys = {
+      {
+        "<leader>i",
+        function()
+          Snacks.image.hover()
+        end,
+        desc = "Preview image at cursor",
+      },
+    },
     opts = function(_, opts)
       opts.dashboard = opts.dashboard or {}
       opts.dashboard.preset = opts.dashboard.preset or {}
+      opts.image = vim.tbl_deep_extend("force", opts.image or {}, {
+        enabled = true,
+        doc = {
+          enabled = true,
+          inline = true,
+          float = true,
+          max_width = 80,
+          max_height = 40,
+        },
+      })
       opts.picker = opts.picker or {}
       opts.picker.sources = opts.picker.sources or {}
       opts.picker.sources.explorer = vim.tbl_deep_extend("force", opts.picker.sources.explorer or {}, {
