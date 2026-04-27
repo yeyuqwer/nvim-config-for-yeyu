@@ -58,5 +58,7 @@ opt.pumheight = 10
 opt.showtabline = 2
 opt.showmode = false
 
+opt.formatoptions:remove({ "c", "r", "o" })
+
 -- Disable cursor blinking.
 opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
