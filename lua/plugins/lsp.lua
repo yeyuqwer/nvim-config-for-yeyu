@@ -5,6 +5,8 @@ local severity_prefix = {
   [vim.diagnostic.severity.HINT] = "😋 ",
 }
 
+local navigation = require("features.navigation")
+
 local virtual_text_namespace = vim.api.nvim_create_namespace("lawliet.highest_severity_virtual_text")
 
 local function highest_severity_per_line(diagnostics)
@@ -95,6 +97,7 @@ return {
       opts.servers["*"] = opts.servers["*"] or {}
       opts.servers["*"].keys = opts.servers["*"].keys or {}
       table.insert(opts.servers["*"].keys, { "K", false })
+      table.insert(opts.servers["*"].keys, { "gd", navigation.open_link_or_definition, desc = "Open link or goto definition" })
       table.insert(opts.servers["*"].keys, { "<leader>k", function() return vim.lsp.buf.hover() end, desc = "Hover" })
       table.insert(opts.servers["*"].keys, { "<leader>ch", function() return vim.lsp.buf.hover() end, desc = "Hover" })
     end,

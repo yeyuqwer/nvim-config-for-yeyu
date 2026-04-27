@@ -20,6 +20,7 @@ end
 -- Fast movement.
 map({ "n", "x" }, "J", "5j", { noremap = true, silent = true })
 map({ "n", "x" }, "K", "5k", { noremap = true, silent = true })
+map("n", "gd", navigation.open_link_or_definition, { silent = true, desc = "Open link or goto definition" })
 
 -- macOS: command + s saves current buffer.
 map("n", "<D-s>", "<cmd>w<CR>", { noremap = true, silent = true, desc = "Save file" })
