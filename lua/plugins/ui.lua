@@ -1,17 +1,25 @@
-local function read_dot_header(path)
-  local ok, raw_lines = pcall(vim.fn.readfile, path)
-  if not ok or not raw_lines then
-    return nil
+local function readDotHeader(path)
+  local rawLines = vim.fn.readfile(path)
+  return table.concat(rawLines, "\n")
+end
+
+local function dashboardPaneCount(dashboard)
+  local paneWidth = dashboard.opts.width + dashboard.opts.pane_gap
+  return math.max(1, math.floor((dashboard._size.width + dashboard.opts.pane_gap) / paneWidth))
+end
+
+local function padHeader(header, columns)
+  if columns <= 0 then
+    return header
   end
 
-  local width = 0
-  for _, line in ipairs(raw_lines) do
-    width = math.max(width, vim.api.nvim_strwidth(line))
+  local padding = string.rep(" ", columns)
+  local lines = vim.split(header, "\n", { plain = true })
+  for index, line in ipairs(lines) do
+    lines[index] = padding .. line
   end
-  if width == 0 then
-    return nil
-  end
-  return table.concat(raw_lines, "\n"), width
+
+  return table.concat(lines, "\n")
 end
 
 return {
@@ -201,14 +209,93 @@ return {
   {
     "akinsho/bufferline.nvim",
     opts = function(_, opts)
-      opts.options = opts.options or {}
-      opts.options.indicator = vim.tbl_deep_extend("force", opts.options.indicator or {}, {
-        style = "underline",
+      opts.options = vim.tbl_deep_extend("force", opts.options or {}, {
+        always_show_bufferline = false,
+        auto_toggle_bufferline = true,
+        indicator = {
+          style = "underline",
+        },
+        separator_style = { "", "" },
+        show_buffer_close_icons = false,
+        show_close_icon = false,
+        show_tab_indicators = true,
+        tab_size = 22,
+        max_name_length = 24,
+        modified_icon = "●",
+        hover = {
+          enabled = true,
+          delay = 150,
+          reveal = { "close" },
+        },
       })
       if (vim.g.colors_name or ""):find("catppuccin") then
-        opts.highlights = require("catppuccin.special.bufferline").get_theme({
-          styles = { "bold" },
-        })
+        opts.highlights = function()
+          local colors = require("catppuccin.palettes").get_palette()
+          local fillBg = "NONE"
+          local activeBg = colors.surface0
+          local inactiveBg = fillBg
+          local visibleBg = fillBg
+          local activeFg = colors.text
+          local inactiveFg = colors.overlay1
+          local mutedFg = colors.overlay0
+          local accent = colors.pink
+          local selectedStyle = { bold = true, underdouble = true, sp = accent }
+
+          return {
+            fill = { bg = fillBg },
+            background = { fg = inactiveFg, bg = inactiveBg },
+            buffer_visible = { fg = colors.subtext1, bg = visibleBg },
+            buffer_selected = vim.tbl_extend("force", { fg = activeFg, bg = activeBg }, selectedStyle),
+            duplicate = { fg = mutedFg, bg = inactiveBg },
+            duplicate_visible = { fg = mutedFg, bg = visibleBg },
+            duplicate_selected = vim.tbl_extend("force", { fg = colors.subtext1, bg = activeBg }, selectedStyle),
+            separator = { fg = inactiveBg, bg = fillBg },
+            separator_visible = { fg = visibleBg, bg = fillBg },
+            separator_selected = { fg = activeBg, bg = fillBg },
+            indicator_visible = { fg = visibleBg, bg = visibleBg },
+            indicator_selected = { fg = accent, bg = activeBg, underdouble = true, sp = accent },
+            modified = { fg = colors.peach, bg = inactiveBg },
+            modified_visible = { fg = colors.peach, bg = visibleBg },
+            modified_selected = { fg = colors.peach, bg = activeBg },
+            close_button = { fg = mutedFg, bg = inactiveBg },
+            close_button_visible = { fg = mutedFg, bg = visibleBg },
+            close_button_selected = { fg = colors.red, bg = activeBg },
+            diagnostic = { fg = mutedFg, bg = inactiveBg },
+            diagnostic_visible = { fg = mutedFg, bg = visibleBg },
+            diagnostic_selected = { fg = colors.subtext1, bg = activeBg, underdouble = true, sp = accent },
+            hint = { fg = colors.teal, bg = inactiveBg },
+            hint_visible = { fg = colors.teal, bg = visibleBg },
+            hint_selected = vim.tbl_extend("force", { fg = colors.teal, bg = activeBg }, selectedStyle),
+            hint_diagnostic = { fg = colors.teal, bg = inactiveBg },
+            hint_diagnostic_visible = { fg = colors.teal, bg = visibleBg },
+            hint_diagnostic_selected = { fg = colors.teal, bg = activeBg },
+            info = { fg = colors.sky, bg = inactiveBg },
+            info_visible = { fg = colors.sky, bg = visibleBg },
+            info_selected = vim.tbl_extend("force", { fg = colors.sky, bg = activeBg }, selectedStyle),
+            info_diagnostic = { fg = colors.sky, bg = inactiveBg },
+            info_diagnostic_visible = { fg = colors.sky, bg = visibleBg },
+            info_diagnostic_selected = { fg = colors.sky, bg = activeBg },
+            warning = { fg = colors.yellow, bg = inactiveBg },
+            warning_visible = { fg = colors.yellow, bg = visibleBg },
+            warning_selected = vim.tbl_extend("force", { fg = colors.yellow, bg = activeBg }, selectedStyle),
+            warning_diagnostic = { fg = colors.yellow, bg = inactiveBg },
+            warning_diagnostic_visible = { fg = colors.yellow, bg = visibleBg },
+            warning_diagnostic_selected = { fg = colors.yellow, bg = activeBg },
+            error = { fg = colors.red, bg = inactiveBg },
+            error_visible = { fg = colors.red, bg = visibleBg },
+            error_selected = vim.tbl_extend("force", { fg = colors.red, bg = activeBg }, selectedStyle),
+            error_diagnostic = { fg = colors.red, bg = inactiveBg },
+            error_diagnostic_visible = { fg = colors.red, bg = visibleBg },
+            error_diagnostic_selected = { fg = colors.red, bg = activeBg },
+            numbers = { fg = mutedFg, bg = inactiveBg },
+            numbers_visible = { fg = mutedFg, bg = visibleBg },
+            numbers_selected = vim.tbl_extend("force", { fg = accent, bg = activeBg }, selectedStyle),
+            tab = { fg = inactiveFg, bg = inactiveBg },
+            tab_selected = vim.tbl_extend("force", { fg = activeFg, bg = activeBg }, selectedStyle),
+            tab_separator = { fg = inactiveBg, bg = fillBg },
+            tab_separator_selected = { fg = activeBg, bg = fillBg },
+          }
+        end
       end
     end,
   },
@@ -251,32 +338,52 @@ return {
       })
 
       -- * thanks https://emojicombos.com/miku
-      local dot_file = vim.fn.stdpath("config") .. "/dot-art.md"
-      local dot_header, dot_width = read_dot_header(dot_file)
-      if dot_header then
-        opts.dashboard.width = math.max(opts.dashboard.width or 60, dot_width)
-        opts.dashboard.preset.header = dot_header
+      local dotFile = vim.fn.stdpath("config") .. "/dot-art.md"
+      local dotHeader = readDotHeader(dotFile)
+      opts.dashboard.preset.header = dotHeader
+
+      opts.dashboard.width = 28
+
+      local dashboardKeys = opts.dashboard.preset.keys
+      local keySplitIndex = math.ceil(#dashboardKeys / 2)
+      for index, item in ipairs(dashboardKeys) do
+        if index > keySplitIndex then
+          item.pane = 2
+        else
+          item.pane = 1
+        end
       end
-      opts.dashboard.preset.keys = vim.tbl_filter(function(item)
-        local key = tostring(item.key or "")
-        local desc = tostring(item.desc or "")
-        local action = tostring(item.action or "")
-        if key == "q" or key == "l" or key == "L" then
-          return false
+
+      local headerLineCount = #vim.split(opts.dashboard.preset.header, "\n", { plain = true })
+      local function centeredHeader(dashboard)
+        local paneCount = dashboardPaneCount(dashboard)
+        local headerOffset = 0
+
+        if paneCount > 1 then
+          headerOffset = dashboard.opts.width + dashboard.opts.pane_gap
         end
-        if desc == "Quit" or desc == "Lazy" then
-          return false
+
+        return {
+          header = padHeader(opts.dashboard.preset.header, headerOffset),
+          padding = 0,
+          pane = 1,
+        }
+      end
+
+      local function rightHeaderSpacer(dashboard)
+        local paneCount = dashboardPaneCount(dashboard)
+        if paneCount < 2 then
+          return nil
         end
-        if action == ":qa" or action == ":Lazy" then
-          return false
-        end
-        return true
-      end, opts.dashboard.preset.keys or {})
+
+        return { text = string.rep("\n", headerLineCount - 1), pane = 2 }
+      end
 
       opts.dashboard.sections = {
-        { header = opts.dashboard.preset.header, padding = 0 },
+        centeredHeader,
+        rightHeaderSpacer,
         { section = "keys",                      gap = 1,    padding = 1 },
-        { section = "startup" },
+        { section = "startup",                   pane = 1 },
       }
     end,
   },
