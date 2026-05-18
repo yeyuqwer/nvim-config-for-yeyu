@@ -83,6 +83,36 @@ return {
       setup_single_virtual_text_per_line()
 
       opts.servers = opts.servers or {}
+      opts.servers.clangd = opts.servers.clangd or {
+        mason = false,
+        root_markers = {
+          "compile_commands.json",
+          "compile_flags.txt",
+          "Makefile",
+          "meson.build",
+          "build.ninja",
+          ".clangd",
+          ".clang-format",
+          ".git",
+        },
+        capabilities = {
+          offsetEncoding = { "utf-16" },
+        },
+        cmd = {
+          "clangd",
+          "--background-index",
+          "--clang-tidy",
+          "--header-insertion=iwyu",
+          "--completion-style=detailed",
+          "--function-arg-placeholders",
+          "--fallback-style=llvm",
+        },
+        init_options = {
+          usePlaceholders = true,
+          completeUnimported = true,
+          clangdFileStatus = true,
+        },
+      }
       opts.servers.lua_ls = opts.servers.lua_ls or {}
       opts.servers.rust_analyzer = opts.servers.rust_analyzer or {}
       opts.servers.ts_ls = opts.servers.ts_ls or {}
